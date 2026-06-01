@@ -1,14 +1,14 @@
 #include <stdio.h>
 
-#define V 5
+#define INF 9999
 
-int minDistance(int dist[], int visited[])
+int minDistance(int dist[], int visited[], int n)
 {
-    int min = 10000, min_index;
+    int min = INF, min_index = -1;
 
-    for(int v = 0; v < V; v++)
+    for(int v = 0; v < n; v++)
     {
-        if(visited[v] == 0 && dist[v] <= min)
+        if(!visited[v] && dist[v] < min)
         {
             min = dist[v];
             min_index = v;
@@ -18,37 +18,42 @@ int minDistance(int dist[], int visited[])
     return min_index;
 }
 
-void printSolution(int dist[])
+void printSolution(int dist[], int n, int src)
 {
-    printf("Vertex\t Distance from Source\n");
+    printf("\nVertex\tDistance from Source %d\n", src);
 
-    for(int i = 0; i < V; i++)
+    for(int i = 0; i < n; i++)
     {
-        printf("%d\t\t%d\n", i, dist[i]);
+        printf("%d\t%d\n", i, dist[i]);
     }
 }
 
-void dijkstra(int graph[V][V], int src)
+void dijkstra(int graph[20][20], int n, int src)
 {
-    int dist[V];
-    int visited[V] = {0};
+    int dist[20], visited[20];
 
-    for(int i = 0; i < V; i++)
-        dist[i] = 10000;
+    for(int i = 0; i < n; i++)
+    {
+        dist[i] = INF;
+        visited[i] = 0;
+    }
 
     dist[src] = 0;
 
-    for(int count = 0; count < V - 1; count++)
+    for(int count = 0; count < n - 1; count++)
     {
-        int u = minDistance(dist, visited);
+        int u = minDistance(dist, visited, n);
+
+        if(u == -1)
+            break;
 
         visited[u] = 1;
 
-        for(int v = 0; v < V; v++)
+        for(int v = 0; v < n; v++)
         {
             if(!visited[v] &&
                graph[u][v] &&
-               dist[u] != 10000 &&
+               dist[u] != INF &&
                dist[u] + graph[u][v] < dist[v])
             {
                 dist[v] = dist[u] + graph[u][v];
@@ -56,21 +61,31 @@ void dijkstra(int graph[V][V], int src)
         }
     }
 
-    printSolution(dist);
+    printSolution(dist, n, src);
 }
 
 int main()
 {
-    int graph[V][V] =
-    {
-        {0,10,0,30,100},
-        {10,0,50,0,0},
-        {0,50,0,20,10},
-        {30,0,20,0,60},
-        {100,0,10,60,0}
-    };
+    int n, graph[20][20], src;
 
-    dijkstra(graph, 0);
+    printf("Enter number of vertices: ");
+    scanf("%d", &n);
+
+    printf("Enter adjacency matrix:\n");
+    printf("(Enter 0 if there is no direct edge)\n");
+
+    for(int i = 0; i < n; i++)
+    {
+        for(int j = 0; j < n; j++)
+        {
+            scanf("%d", &graph[i][j]);
+        }
+    }
+
+    printf("Enter source vertex (0 to %d): ", n - 1);
+    scanf("%d", &src);
+
+    dijkstra(graph, n, src);
 
     return 0;
 }
